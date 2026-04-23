@@ -1,11 +1,8 @@
-import tkinter as tk    
-from tkinter import ttk
-from controllers.login_controller import login_controller
-from utils.hasher import *
 import hashlib
-import random
-import string
 import requests
+from ttkbootstrap.dialogs import Messagebox
+from tkinter import ttk
+from utils.hasher import *
 
 
 class Login(ttk.Frame):
@@ -88,7 +85,21 @@ class Login(ttk.Frame):
         
         # Call the auth URL
         response = requests.get(auth_url) # Hmm, this is always returning <200>'s...
+        # SO apparently, this is by design. I need to examine the "subsonic-response" in the response for errors
         
-        # Handle response code
+        """ Example of error with /rest/ping endpoint:
+        <subsonic-response xmlns="http://subsonic.org/restapi" status="failed" version="1.16.1" type="navidrome" serverVersion="0.61.2 (aa84e645)" openSubsonic="true">
+            <error code="40" message="Wrong username or password"></error>
+        </subsonic-response>
+        """
+        decoded_response = hasher.response_parser(self, response)
+        
+        # Handle response
+        if decoded_response['result'] == 'failed':
+            # Create pop-up with error message
+            Messagebox.show_error(message=f"Error: {decoded_response['response_message']}")
+        else:
+            # Populate track list!
+            pass
         
         pass

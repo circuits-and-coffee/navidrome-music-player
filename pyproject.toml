@@ -4,4 +4,7 @@ version = "0.1.0"
 description = "This is my first Boot.dev project! I'm using this to get familiar with Subsonic's API for my pyPodPro project."
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "ttkbootstrap>=1.20.2",
+    "xmltodict>=1.0.4",
+]
