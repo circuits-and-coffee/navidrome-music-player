@@ -15,12 +15,13 @@ class hasher:
         # Take an XML response from Subsonic API and convert to JSON
         decoded_response = response.content.decode("utf-8")
         response_as_json = json.loads(json.dumps(xmltodict.parse(decoded_response)))
-        response = {
-            "server_version": response_as_json['subsonic-response']['@serverVersion'],
-            "result": response_as_json['subsonic-response']['@status']
-        }
-        if response_as_json['subsonic-response']['@status'] == 'failed':
-            response['response_code'] = response_as_json['subsonic-response']['error']['@code']
-            response['response_message'] = response_as_json['subsonic-response']['error']['@message']
-        
-        return response
+        flattened_response = hasher.flatten_response({}, response_as_json)        
+        return flattened_response
+    
+    def flatten_response(flattened_response_tree, specific_response):    
+        for node_name, value in specific_response.items():
+            if isinstance(value, dict):
+                hasher.flatten_response(flattened_response_tree, specific_response[node_name])
+            else:
+                flattened_response_tree[node_name] = value
+        return flattened_response_tree

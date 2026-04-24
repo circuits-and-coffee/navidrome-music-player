@@ -31,14 +31,13 @@ class Login(ttk.Frame):
         self.quit_btn.grid(column=0, row=5)
         
         # Music List
-        self.music_list_frame = ttk.Frame(self, width=300, height=600)
+        self.music_list_frame = ttk.Frame(self)
         self.music_list_frame.grid(row=0, column=1)
 
         self.song_list_label = ttk.Label(self.music_list_frame, text="Songlist")
         self.song_list_label.grid(column=0, row=0)
         self.song_list = ttk.Treeview(self.music_list_frame)
         self.song_list.grid(column=0, row=1)
-        # song_list.place(height=600, width=500)
 
         # Now Playing
         now_playing_frame = ttk.Frame(self)
@@ -56,7 +55,9 @@ class Login(ttk.Frame):
         # Use this method to authenticate
         
         # Capture input parameters
-        server = self.server_url.get() # Need to get just the domain/subdomain
+        server = self.server_url.get()
+        if server.startswith("https://"):
+            server = server.lstrip("https://")
         un = self.username_input.get()
         pw = self.password_input.get()
         
@@ -77,11 +78,10 @@ class Login(ttk.Frame):
         
         # Generate salt & hashed combination
         salt = hasher.salt_generator(self, 8)
-        # token = hashlib.md5(f"{pw}{salt}")
         hashed_pw = hashlib.md5(f"{pw}{salt}".encode("utf-8")).hexdigest()
         
         # Build the auth URL
-        auth_url = f"{server}/rest/ping.view?u={un}&t={hashed_pw}&s={salt}&v=1.13.0&c=myapp"
+        auth_url = f"https://{server}/rest/ping?u={un}&t={hashed_pw}&s={salt}&v=1.13.0&c=myapp"
         
         # Call the auth URL
         response = requests.get(auth_url) # Hmm, this is always returning <200>'s...
@@ -95,11 +95,17 @@ class Login(ttk.Frame):
         decoded_response = hasher.response_parser(self, response)
         
         # Handle response
-        if decoded_response['result'] == 'failed':
+        if decoded_response['@status'] == 'failed':
             # Create pop-up with error message
-            Messagebox.show_error(message=f"Error: {decoded_response['response_message']}")
+            Messagebox.show_error(message=f"Error: {decoded_response['@message']}")
         else:
-            # Populate track list!
-            pass
-        
+            # Populate random track list!
+            # We'll eventually just store a token and run the below through a "Shuffle" button
+            auth_url = f"https://{server}/rest/getRandomSongs?u={un}&t={hashed_pw}&s={salt}&v=1.13.0&c=myapp"
+            response = requests.get(auth_url)
+            decoded_response = hasher.response_parser(self, response)
+            retrieved_songs = decoded_response['song']
+            for song in retrieved_songs:            
+                self.song_list.insert("", 'end', text=song['@title'], values=(song['@title'],song['@id']))
+
         pass

@@ -4,6 +4,13 @@
             "name": "Python Debugger: Current File",
             "type": "debugpy",
             "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Python Debugger: Main Project",
+            "type": "debugpy",
+            "request": "launch",
             "program": "main.py",
             "console": "integratedTerminal"
         }
