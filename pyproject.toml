@@ -5,6 +5,9 @@ description = "This is my first Boot.dev project! I'm using this to get familiar
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "keyring>=25.7.0",
+    "keyrings-alt>=5.0.2",
+    "requests>=2.33.1",
     "ttkbootstrap>=1.20.2",
     "xmltodict>=1.0.4",
 ]

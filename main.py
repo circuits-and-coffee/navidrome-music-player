@@ -1,15 +1,20 @@
 import tkinter as tk
 from tkinter import ttk
 import views.ui as ui
+import views.login as login
 
 def main():
     print("Hello from navidrome-music-player!")
     
     # Initialize main window
     root = tk.Tk()
+    root.resizable(False, False)
+    root.geometry("640x480")
     
-    # Login will be the top left, songlist will be top right, player will be bottom half
-    form = ui.Login(root)
+    # form = ui.Songlist(root)
+    
+    # Start by initializing the login view
+    form = login.Login(root)
     
     # Apply form to grid
     form.grid()
