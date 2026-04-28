@@ -38,10 +38,6 @@ class Login(ttk.Frame):
         self.quit_btn = ttk.Button(server_details_frame, text="Quit", command=root.destroy)
         self.quit_btn.grid(column=0, row=5)
         
-        # server_details_frame.grid(row=0, column=0, sticky="nsew")
-        # self.music_list_frame.grid(row=0, column=1, sticky="nsew")
-        # now_playing_frame.grid(row=1, column=0, columnspan=2, sticky="nsew")
-        
         self.root = root
         
     def initiate_login(self):
