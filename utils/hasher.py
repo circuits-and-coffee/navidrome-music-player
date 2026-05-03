@@ -14,7 +14,7 @@ class hasher:
     def response_parser(self, response):
         # Take an XML response from Subsonic API and convert to JSON
         # NOTE that this might not always be an XML (in the case of us getting a specific song!)
-        if response.apparent_encoding == 'utf-8':
+        if response.apparent_encoding == 'utf-8' or response.apparent_encoding == 'ascii':
             decoded_response = response.content.decode("utf-8")
             response_as_json = json.loads(json.dumps(xmltodict.parse(decoded_response)))
             flattened_response = hasher.flatten_response({}, response_as_json)        

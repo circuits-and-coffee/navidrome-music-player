@@ -3,14 +3,17 @@ import requests
 from ttkbootstrap.dialogs import Messagebox
 from tkinter import ttk
 from utils.hasher import *
+# from views.login import Login
 import keyring
 import configparser
 import pygame
 import io
 
 class Songlist(ttk.Frame):
-    def __init__(self, root):
+    def __init__(self, root, on_logout_success=None):
         super().__init__(root)
+        
+        self.on_logout_success = on_logout_success
         
         # Load config values
         config = configparser.ConfigParser()
@@ -46,16 +49,16 @@ class Songlist(ttk.Frame):
         self.shuffle_btn.grid(column=0, row=0)
         
         # Play
-        self.shuffle_btn = ttk.Button(self.button_row_frame, text="Play", command=self.play_music)
-        self.shuffle_btn.grid(column=1, row=0)
+        self.play_btn = ttk.Button(self.button_row_frame, text="Play", command=self.play_music)
+        self.play_btn.grid(column=1, row=0)
         
         # Pause
-        self.shuffle_btn = ttk.Button(self.button_row_frame, text="Pause", command=self.pause_music)
-        self.shuffle_btn.grid(column=2, row=0)
+        self.pause_btn = ttk.Button(self.button_row_frame, text="Pause", command=self.pause_music)
+        self.pause_btn.grid(column=2, row=0)
         
         # Logout
-        self.shuffle_btn = ttk.Button(self.button_row_frame, text="Logout", command=self.logout)
-        self.shuffle_btn.grid(column=3, row=0)
+        self.logout_btn = ttk.Button(self.button_row_frame, text="Logout", command=self.logout)
+        self.logout_btn.grid(column=3, row=0)
 
         # Now Playing
         style.configure('BlueFrame.TFrame', borderwidth=2, relief='solid', background='blue')
@@ -101,22 +104,32 @@ class Songlist(ttk.Frame):
             subsonic_id = first_song_data['values'][1]
             auth_url = f"https://{self.server}/rest/stream?u={self.username}&t={hashed_pw}&s={salt}&v=1.13.0&c=myapp&id={subsonic_id}"
             response = requests.get(auth_url)
-            
-            decoded_response = hasher.response_parser(self, response) # There's a bug with this I'll have to debug later
             audio_data = io.BytesIO(response.content)
             
             pygame.mixer.init()
             pygame.mixer.music.load(audio_data)
-            pygame.mixer.music.play()
-        else:
-            # Resume music playback?
-            pygame.mixer.music.play()
+        pygame.mixer.music.play()
+
     
     def pause_music(self):
         pygame.mixer.music.pause()
     
-    def logout():
+    def logout(self):
         # Delete credentials from keyring and delete server info from config.ini
         # Keep all the other config settings for now, though
+        config = configparser.ConfigParser()
+        config.read('config.ini')
+        username = config['server']['username']
+        config['server'] = {}
         
-        pass
+        with open('config.ini', 'w') as configfile:
+                config.write(configfile)
+        
+        # Attempt to clear password from keyring
+        try:
+            keyring.delete_password("navidrome_sample_player", username)
+            print("Password deleted successfully.")
+        except keyring.errors.PasswordDeleteError:
+            print("Error: Password not found or could not be deleted.")
+        
+        self.on_logout_success()

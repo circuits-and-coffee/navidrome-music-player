@@ -3,14 +3,18 @@ import requests
 from ttkbootstrap.dialogs import Messagebox
 from tkinter import ttk
 from utils.hasher import *
-from views.ui import Songlist
+# from views.songlist import Songlist
 import keyring
 import configparser
 
 
 class Login(ttk.Frame):
-    def __init__(self, root):
+    
+    def __init__(self, root, on_login_success=None):
         super().__init__(root)
+        
+        self.on_login_success = on_login_success
+        
         # Will change the UI
         self.columnconfigure(0, weight=0, minsize=400)  # Left column (server details)
         self.columnconfigure(1, weight=0, minsize=600)  # Right column (music list)
@@ -40,13 +44,14 @@ class Login(ttk.Frame):
         
         self.root = root
         
+        
     def initiate_login(self):
         # Use this method to authenticate
         
         # Capture input parameters
         server = self.server_url.get()
         if server.startswith("https://"):
-            server = server.lstrip("https://")
+            server = server.removeprefix("https://")
         un = self.username_input.get()
         pw = self.password_input.get()
         
@@ -76,11 +81,13 @@ class Login(ttk.Frame):
             with open('config.ini', 'w') as configfile:
                 config.write(configfile)
             
+            # Attempt to add password to keyring
             service_id = 'navidrome_sample_player'
-            keyring.set_password(service_id, un, pw)
+            try:
+                keyring.set_password(service_id, un, pw)
+                print("Password added successfully.")
+            except keyring.errors.Password:
+                print("Error: Unable to add password")
             
-            # Load the SongList view      
-            self.destroy()
-            form = Songlist(self.root)
-            # Apply form to grid
-            form.grid()
+            # Call our on_login_success function
+            self.on_login_success()
