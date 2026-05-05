@@ -2,8 +2,8 @@ import hashlib
 import requests
 from ttkbootstrap.dialogs import Messagebox
 from tkinter import ttk
+from ttkbootstrap import *
 from utils.hasher import *
-# from views.songlist import Songlist
 import keyring
 import configparser
 
@@ -11,36 +11,42 @@ import configparser
 class Login(ttk.Frame):
     
     def __init__(self, root, on_login_success=None):
-        super().__init__(root)
+        super().__init__(root, height=640, width=480, borderwidth=2, relief="groove")
         
         self.on_login_success = on_login_success
         
-        # Will change the UI
-        self.columnconfigure(0, weight=0, minsize=400)  # Left column (server details)
-        self.columnconfigure(1, weight=0, minsize=600)  # Right column (music list)
-        self.rowconfigure(0, weight=0, minsize=300)     # Top row
-        self.rowconfigure(1, weight=0, minsize=180)     # Bottom row (now playing)
+        # Main Server Details        
+        self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=0)
+        self.columnconfigure(2, weight=0)
+        self.columnconfigure(3, weight=1)
+        self.rowconfigure(0, weight=1) # Top row spacer
+        self.rowconfigure(1, weight=0) # "Login" text row
+        self.rowconfigure(2, weight=0) # Server domain row
+        self.rowconfigure(3, weight=0) # Username row
+        self.rowconfigure(4, weight=0) # Password row
+        self.rowconfigure(5, weight=0) # Button row
+        self.rowconfigure(6, weight=1) # Bottom row spacer
         
-        # Main Server Details
-        server_details_frame = ttk.Frame(self, width=400, height=300)
-        server_details_frame.grid(row=0, column=0)
-
-        self.server_url_label = ttk.Label(server_details_frame, text="Enter Server URL")
-        self.server_url_label.grid(column=0, row=0)
-        self.server_url = ttk.Entry(server_details_frame)
-        self.server_url.grid(column=1, row=0)
-        self.username_label = ttk.Label(server_details_frame, text="Enter Username")
-        self.username_label.grid(column=0, row=1)
-        self.username_input = ttk.Entry(server_details_frame)
-        self.username_input.grid(column=1, row=1)
-        self.password_label = ttk.Label(server_details_frame, text="Enter Password")
-        self.password_label.grid(column=0, row=2)
-        self.password_input = ttk.Entry(server_details_frame, show="*")
-        self.password_input.grid(column=1, row=2)
-        self.login_btn = ttk.Button(server_details_frame, text="Login", command=self.initiate_login)
-        self.login_btn.grid(column=0, row=3)
-        self.quit_btn = ttk.Button(server_details_frame, text="Quit", command=root.destroy)
-        self.quit_btn.grid(column=0, row=5)
+        
+        self.server_url_label = ttk.Label(self, text="Login to your Navidrome/Subsonic Instance")
+        self.server_url_label.grid(column=1, row=1, columnspan=2)
+        self.server_url_label = ttk.Label(self, text="Enter Server URL")
+        self.server_url_label.grid(column=1, row=2)
+        self.server_url = ttk.Entry(self)
+        self.server_url.grid(column=2, row=2)
+        self.username_label = ttk.Label(self, text="Enter Username")
+        self.username_label.grid(column=1, row=3)
+        self.username_input = ttk.Entry(self)
+        self.username_input.grid(column=2, row=3)
+        self.password_label = ttk.Label(self, text="Enter Password")
+        self.password_label.grid(column=1, row=4)
+        self.password_input = ttk.Entry(self, show="*")
+        self.password_input.grid(column=2, row=4)
+        self.login_btn = ttk.Button(self, text="Login", command=self.initiate_login)
+        self.login_btn.grid(column=1, row=5)
+        self.quit_btn = ttk.Button(self, text="Quit", command=root.destroy)
+        self.quit_btn.grid(column=2, row=5)
         
         self.root = root
         

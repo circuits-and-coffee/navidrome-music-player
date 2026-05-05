@@ -1,5 +1,7 @@
 import tkinter as tk
-from tkinter import ttk
+# from tkinter import ttk
+import ttkbootstrap as ttk
+from ttkbootstrap import *
 
 from views import login
 from views import songlist
@@ -9,8 +11,7 @@ import configparser
 class App:
     # Use this class to handle view routing and other high-level actions
     def __init__(self):
-        # What will I do here? Anything else?
-        self.root = tk.Tk()
+        self.root = ttk.Window()
         self.root.resizable(False, False)
         self.root.geometry("640x480")
         self.root.title("Simple Navidrome Client")
@@ -20,16 +21,12 @@ class App:
         # Search for config values
         config = configparser.ConfigParser()
         config.read('config.ini')
-        if 'domain' in config:     
-            # Automatically jump to music screen
+        if 'domain_name' in config._sections['server']:
+            # Previously authenticated, automatically jump to music screen
             self.show_songlist()
         else:
-            try: 
-                # Create or open blank config file
-                self.show_login()
-                
-            except Exception as e:
-                print(f"Error when changing view: {e}")
+            # Create or open blank config file
+            self.show_login()
         
     def clear_view(self):
         for child in self.root.winfo_children():
@@ -39,11 +36,15 @@ class App:
         self.clear_view()
         form = login.Login(self.root, on_login_success=self.show_songlist)
         form.grid()
+        self.root.columnconfigure(0, weight=1)
+        self.root.rowconfigure(0, weight=1)
         
     def show_songlist(self):
         self.clear_view()
         form = songlist.Songlist(self.root, on_logout_success=self.show_login)
         form.grid()
+        self.root.columnconfigure(0, weight=1)
+        self.root.rowconfigure(0, weight=1)
 
 def main():
     print("Hello from navidrome-music-player!")

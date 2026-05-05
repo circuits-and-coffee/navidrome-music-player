@@ -2,6 +2,7 @@ import hashlib
 import requests
 from ttkbootstrap.dialogs import Messagebox
 from tkinter import ttk
+import tkinter as tk
 from utils.hasher import *
 # from views.login import Login
 import keyring
@@ -11,7 +12,7 @@ import io
 
 class Songlist(ttk.Frame):
     def __init__(self, root, on_logout_success=None):
-        super().__init__(root)
+        super().__init__(root, height=640, width=480, borderwidth=2, relief="groove")
         
         self.on_logout_success = on_logout_success
         
@@ -23,55 +24,55 @@ class Songlist(ttk.Frame):
         self.service_id = 'navidrome_sample_player'
         
         # Configure two columns that each take up 50% of the total window width
-        root.columnconfigure(0, weight=1)
-        root.columnconfigure(1, weight=1)
-        root.rowconfigure(0, weight=1)
-        
-        style = ttk.Style()
-        style.configure('CustomRed.TFrame', background='red', borderwidth=2, relief='solid')
-        style.map('CustomRed.TFrame', background=[('active', 'red')])  # Ensure it applies on interaction
+        self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=0)
+        self.columnconfigure(2, weight=1)
+        self.rowconfigure(0, weight=1) # Top spacer row
+        self.rowconfigure(1, weight=0) # Title row
+        self.rowconfigure(2, weight=0) # Music list row
+        self.rowconfigure(3, weight=0) # Button row
+        self.rowconfigure(4, weight=1) # Bottom spacer row
         
         # Music List
-        self.music_list_frame = ttk.Frame(self,borderwidth=5, relief="ridge")
-        self.music_list_frame.grid(row=0, column=0, sticky="nsew")
-
-        self.song_list_label = ttk.Label(self.music_list_frame, text="Songlist")
-        self.song_list_label.grid(column=0, row=0)
-        self.song_list = ttk.Treeview(self.music_list_frame)
-        self.song_list.grid(column=0, row=1)
+        self.song_list_label = ttk.Label(self, text="Track List")
+        self.song_list_label.grid(column=1, row=1)
+        self.song_list = ttk.Treeview(self)
+        self.song_list.column("#0", width=300, stretch=tk.NO)
+        self.song_list.grid(column=1, row=2)
         
         # Buttons
         self.button_row_frame = ttk.Frame(self)
-        self.button_row_frame.grid(row=2, column=0, sticky="nsew")
+        self.button_row_frame.grid(row=3, column=1, sticky="nsew")
         
         # Shuffle
         self.shuffle_btn = ttk.Button(self.button_row_frame, text="Shuffle", command=self.populate_song_list)
-        self.shuffle_btn.grid(column=0, row=0)
+        self.shuffle_btn.grid(column=0, row=0, sticky="nsew")
         
         # Play
         self.play_btn = ttk.Button(self.button_row_frame, text="Play", command=self.play_music)
-        self.play_btn.grid(column=1, row=0)
+        self.play_btn.grid(column=1, row=0, sticky="nsew")
         
         # Pause
         self.pause_btn = ttk.Button(self.button_row_frame, text="Pause", command=self.pause_music)
-        self.pause_btn.grid(column=2, row=0)
+        self.pause_btn.grid(column=2, row=0, sticky="nsew")
         
         # Logout
         self.logout_btn = ttk.Button(self.button_row_frame, text="Logout", command=self.logout)
-        self.logout_btn.grid(column=3, row=0)
+        self.logout_btn.grid(column=3, row=0, sticky="nsew")
 
         # Now Playing
-        style.configure('BlueFrame.TFrame', borderwidth=2, relief='solid', background='blue')
-        now_playing_frame = ttk.Frame(self,borderwidth=5, relief="ridge")
-        now_playing_frame.grid(row=0, column=1, sticky="nsew")
-        current_song_track_label = ttk.Label(now_playing_frame, text="Current Song")
-        current_song_track_label.grid(column=0, row=0, sticky="nsew")
-        current_song_track = ttk.Entry(now_playing_frame)
-        current_song_track.grid(column=1, row=0, sticky="nsew")
-        current_song_artist_label = ttk.Label(now_playing_frame, text="Current Artist")
-        current_song_artist_label.grid(column=0, row=1, sticky="nsew")
-        current_song_artist = ttk.Entry(now_playing_frame)
-        current_song_artist.grid(column=1, row=1, sticky="nsew")
+        # Move this to its own class
+        # style.configure('BlueFrame.TFrame', borderwidth=2, relief='solid', background='blue')
+        # now_playing_frame = ttk.Frame(self,borderwidth=5, relief="ridge")
+        # now_playing_frame.grid(row=0, column=1, sticky="nsew")
+        # current_song_track_label = ttk.Label(now_playing_frame, text="Current Song")
+        # current_song_track_label.grid(column=0, row=0, sticky="nsew")
+        # current_song_track = ttk.Entry(now_playing_frame)
+        # current_song_track.grid(column=1, row=0, sticky="nsew")
+        # current_song_artist_label = ttk.Label(now_playing_frame, text="Current Artist")
+        # current_song_artist_label.grid(column=0, row=1, sticky="nsew")
+        # current_song_artist = ttk.Entry(now_playing_frame)
+        # current_song_artist.grid(column=1, row=1, sticky="nsew")
         
         self.populate_song_list()
         
@@ -133,3 +134,9 @@ class Songlist(ttk.Frame):
             print("Error: Password not found or could not be deleted.")
         
         self.on_logout_success()
+        
+class NowPlaying(ttk.Frame):
+    def __init__(self):
+        super().__init__(self)
+        
+        pass
