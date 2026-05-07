@@ -6,7 +6,6 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "keyring>=25.7.0",
-    "keyrings-alt>=5.0.2",
     "pygame>=2.6.1",
     "requests>=2.33.1",
     "ttkbootstrap>=1.20.2",
